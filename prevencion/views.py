@@ -26,6 +26,18 @@ from .models import PreguntaEducativa
 
 
 # ============================================================
+# PÁGINA DE PRESENTACIÓN (LANDING)
+# ============================================================
+
+def landing(request):
+
+    return render(
+        request,
+        'prevencion/landing.html'
+    )
+
+
+# ============================================================
 # REGISTRO DE USUARIO
 # ============================================================
 

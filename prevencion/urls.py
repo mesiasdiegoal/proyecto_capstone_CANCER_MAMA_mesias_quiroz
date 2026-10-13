@@ -2,7 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.iniciar_sesion, name='iniciar_sesion'),
+    path('', views.landing, name='landing'),
+    path('iniciar-sesion/', views.iniciar_sesion, name='iniciar_sesion'),
     path('inicio/', views.inicio, name='inicio'),
     path('cerrar-sesion/', views.cerrar_sesion, name='cerrar_sesion'),
     path('registro/', views.registro_usuario, name='registro'), # Corregido a registro_usuario
