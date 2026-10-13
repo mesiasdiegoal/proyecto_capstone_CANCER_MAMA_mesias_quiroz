@@ -4,17 +4,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* Escala pastel de morados / lavanda */
     --purple-50:  #f6f0fd;
     --purple-100: #eee2fc;
     --purple-200: #e0ccfa;
     --purple-300: #c9a7f5;
     --purple-400: #ad7cee;
-    --purple-500: #8b5cf6;   /* Morado principal pastel vibrante */
-    --purple-600: #7c3aed;   /* Enfoque / Hover */
-    --purple-700: #5b21b6;   /* Texto oscuro */
+    --purple-500: #8b5cf6;
+    --purple-600: #7c3aed;
+    --purple-700: #5b21b6;
 
-    /* Alias de tema */
     --primary-color: var(--purple-500);
     --primary-hover: var(--purple-600);
 
@@ -37,11 +35,11 @@
     --gradient-bg: linear-gradient(135deg, #fbf7ff 0%, #f3e8ff 40%, #e9d5ff 100%);
 }
 
-/* ===================================================
-   FONDO Y TIPOGRAFÍA GENERAL
-   =================================================== */
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    max-width: 100%;
+    touch-action: pan-y;
 }
 
 body {
@@ -51,10 +49,11 @@ body {
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    width: 100%;
+    max-width: 100%;
     position: relative;
     overflow-x: hidden;
-    opacity: 0;
-    animation: fadeInPage 0.6s ease forwards;
+    touch-action: pan-y;
 }
 
 body::before,
@@ -92,17 +91,12 @@ body::after {
     50% { transform: translate(35px, -25px) scale(1.08); }
 }
 
-@keyframes fadeInPage {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 body.page-leaving {
     animation: fadeOutPage 0.28s ease forwards;
 }
 
 @keyframes fadeOutPage {
-    from { opacity: 1; transform: translateY(0); }
+    from { opacity: 1; transform: none; }
     to { opacity: 0; transform: translateY(-8px); }
 }
 
@@ -148,7 +142,7 @@ h1, h2, h3, h4, h5, h6 {
     transform: scaleX(1);
 }
 
-.card:hover, .card-session:hover {
+.card:not(.auth-card):hover, .card-session:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-hover) !important;
     border-color: var(--purple-300) !important;
@@ -224,8 +218,8 @@ h1, h2, h3, h4, h5, h6 {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background-color: rgba(20, 15, 35, 0.4);
     backdrop-filter: blur(5px);
     display: flex;
@@ -259,7 +253,6 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-/* Botón de la X corregido (sobrescribe todo lo de Bootstrap) */
 .modal-x-btn {
     position: absolute !important;
     top: 18px !important;
@@ -280,7 +273,6 @@ h1, h2, h3, h4, h5, h6 {
     color: #7c3aed !important;
 }
 
-/* Botón "Entendido" */
 .btn-entendido {
     width: 100%;
     background-color: #7c3aed;
@@ -304,7 +296,6 @@ h1, h2, h3, h4, h5, h6 {
     transform: scale(0.98);
 }
 
-/* Gráficos de la Ilustración */
 .illustration-container {
     position: relative;
     width: 200px;
@@ -440,9 +431,6 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 50%;
 }
 
-/* Rectángulos de colores que explican cada nivel.
-   Cada nivel define su color principal, uno oscuro para el texto
-   y uno pastel para el fondo. */
 .nivel-tarjeta {
     height: 100%;
     display: flex;
@@ -607,101 +595,64 @@ h1, h2, h3, h4, h5, h6 {
 /* ===================================================
    ASISTENTE SONIA — WIDGET FLOTANTE
    =================================================== */
-
 .chat-widget-btn {
     position: fixed;
     right: 32px;
     bottom: 28px;
-
     display: flex;
     align-items: center;
     gap: 10px;
-
     background: var(--gradient-brand);
     color: #ffffff;
-
     border: none;
     border-radius: 50px;
-
     padding: 14px 22px;
-
     font-weight: 600;
-
     box-shadow: 0 12px 30px rgba(124, 58, 237, 0.28);
-
     cursor: pointer;
-
     z-index: 9998;
-
     transition: var(--transition);
 }
 
 .chat-widget-btn:hover {
     transform: translateY(-2px);
-
     background: var(--gradient-brand-hover);
-
     box-shadow: 0 16px 35px rgba(124, 58, 237, 0.35);
 }
 
-
-/* Ventana principal */
-
 .chat-widget-box {
     position: fixed;
-
     right: 32px;
     bottom: 100px;
-
     width: 380px;
     height: 520px;
-
     background: #ffffff;
-
     border: 1px solid var(--border-color);
     border-radius: 22px;
-
     box-shadow: 0 20px 50px rgba(98, 49, 160, 0.25);
-
     overflow: hidden;
-
     display: flex;
     flex-direction: column;
-
     opacity: 0;
     visibility: hidden;
-
     transform: translateY(20px) scale(0.96);
-
-    transition:
-        opacity 0.2s ease,
-        transform 0.2s ease,
-        visibility 0.2s ease;
-
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
     z-index: 9999;
 }
 
 .chat-widget-box.is-open {
     opacity: 1;
     visibility: visible;
-
     transform: translateY(0) scale(1);
 }
 
-
-/* Header */
-
 .chat-widget-header {
     background: var(--gradient-brand);
-
     color: #ffffff;
-
     padding: 18px 20px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     flex-shrink: 0;
 }
 
@@ -710,80 +661,54 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
 }
 
-
-/* Cuerpo del chat */
-
 .chat-widget-body {
     flex: 1;
-
     overflow-y: auto;
-
     padding: 18px;
-
     background: var(--purple-50);
-
     display: flex;
     flex-direction: column;
-
     gap: 12px;
-
     scroll-behavior: smooth;
 }
-
-
-/* Mensajes */
 
 .msg {
     max-width: 88%;
     padding: 12px 14px;
-
     border-radius: 16px;
-
     font-size: 0.95rem;
     line-height: 1.45;
-
     word-wrap: break-word;
     overflow-wrap: break-word;
-
     white-space: normal;
-
     text-align: left;
 }
 
 .msg-sonia {
     align-self: flex-start;
-
     background: #ffffff;
     color: var(--text-dark);
-
     border: 1px solid var(--border-color);
-
     border-bottom-left-radius: 6px;
-
     box-shadow: 0 3px 10px rgba(60, 30, 90, 0.04);
 }
 
-/* Mensaje de error debajo de un campo vacío (login / registro) */
 .campo-error {
     margin-top: 6px;
     font-size: 0.85rem;
     color: #c0392b;
 }
 
-/* Aviso del chat cuando se intenta enviar un mensaje vacío */
 .chat-aviso-vacio {
     margin-bottom: 6px;
     padding: 6px 10px;
-
     font-size: 0.85rem;
     color: #9a3412;
-
     background: #fff7ed;
     border: 1px solid #fed7aa;
     border-radius: 10px;
 }
 
-/* Botón "Reintentar" dentro de un mensaje de error de Sonia */
 .btn-reintentar-sonia {
     display: inline-flex;
     align-items: center;
@@ -804,7 +729,6 @@ h1, h2, h3, h4, h5, h6 {
     background: #ebe1fe;
 }
 
-/* Párrafos y listas dentro de las respuestas de Sonia */
 .msg-sonia p,
 .msg-sonia ul,
 .msg-sonia ol {
@@ -826,24 +750,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .msg-usuario {
     align-self: flex-end;
-
     background: var(--gradient-brand);
-
     color: #ffffff;
-
     border-bottom-right-radius: 6px;
 }
 
-
-/* Footer */
-
 .chat-widget-footer {
     background: #ffffff;
-
     padding: 14px;
-
     border-top: 1px solid var(--border-color);
-
     flex-shrink: 0;
 }
 
@@ -855,39 +770,27 @@ h1, h2, h3, h4, h5, h6 {
 
 .chat-widget-footer input {
     height: 46px;
-
     border-radius: 14px;
-
     border: 1px solid var(--purple-300);
-
     padding-left: 14px;
-
     font-size: 0.95rem;
 }
 
 .chat-widget-footer input:focus {
     border-color: var(--purple-500);
-
-    box-shadow:
-        0 0 0 3px rgba(139, 92, 246, 0.15);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
 }
 
 .chat-widget-footer button {
     width: 46px;
     height: 46px;
-
     border-radius: 50% !important;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 0 !important;
-
     border: none !important;
-
     background: var(--gradient-brand) !important;
-
     color: #ffffff !important;
 }
 
@@ -895,17 +798,10 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--gradient-brand-hover) !important;
 }
 
-
-/* Indicador escribiendo */
-
 #typingIndicator {
     color: var(--text-muted) !important;
-
     font-size: 0.82rem;
 }
-
-
-/* Scroll */
 
 .chat-widget-body::-webkit-scrollbar {
     width: 6px;
@@ -916,24 +812,129 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 10px;
 }
 
+/* ===================================================
+   RESPONSIVE / MÓVIL
+   =================================================== */
 
-/* Responsive */
+.modulo-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    gap: 1rem;
+}
+.modulo-icono {
+    width: 52px;
+    height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(139, 92, 246, 0.12);
+    color: #7c3aed;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+.modulo-texto h5 { color: #7c3aed; margin-bottom: 0.5rem; }
+.modulo-texto p  { margin: 0; }
 
+.hero-titulo {
+    color: #7c3aed !important;
+    letter-spacing: -0.5px;
+    font-size: clamp(1.75rem, 6.5vw, 3rem);
+    line-height: 1.15;
+    text-wrap: balance;
+}
+.hero-texto {
+    font-size: clamp(0.95rem, 3.6vw, 1.25rem);
+    max-width: 680px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: var(--text-dark) !important;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
+@media (hover: none) {
+    .card:not(.auth-card):hover, .card-session:hover,
+    .nivel-tarjeta:hover,
+    .btn-primary:hover, .btn-medtech:hover,
+    .btn-outline-secondary:hover {
+        transform: none !important;
+    }
+    .card:hover::before, .card-session:hover::before { transform: scaleX(0); }
+}
+
+/* --- Celulares (hasta 576px) --- */
 @media (max-width: 576px) {
 
-    .chat-widget-btn {
-        right: 16px;
-        bottom: 18px;
+    input.form-control,
+    .chat-widget-footer input {
+        font-size: 16px !important;
     }
+
+    .container { padding-left: 0; padding-right: 0; }
+
+    .card-session { border-radius: 18px !important; }
+    .card-session.p-4 { padding: 1.1rem !important; }
+
+    .btn { padding: 0.6rem 1.1rem !important; font-size: 0.92rem !important; }
+
+    .modulo-card {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            "icono texto"
+            "boton boton";
+        align-items: center;
+        text-align: left;
+        gap: 0.75rem 1rem;
+    }
+    .modulo-icono { grid-area: icono; width: 46px; height: 46px; font-size: 1.3rem; }
+    .modulo-texto { grid-area: texto; }
+    .modulo-texto h5 { font-size: 1.05rem; margin-bottom: 0.2rem; }
+    .modulo-texto p  { font-size: 0.85rem; line-height: 1.4; }
+    .modulo-btn { grid-area: boton; margin-top: 0 !important; }
+
+    .chat-widget-btn {
+        width: 56px;
+        height: 56px;
+        padding: 0 !important;
+        justify-content: center;
+        right: 16px;
+        bottom: 16px;
+    }
+    .chat-widget-btn span { display: none; }
 
     .chat-widget-box {
         width: calc(100% - 24px);
-
-        height: 70vh;
-
+        height: 72dvh;
         right: 12px;
-        bottom: 88px;
-
+        bottom: 84px;
         border-radius: 18px;
     }
+
+    .chat-wrapper { height: 100dvh !important; }
+    .chat-messages { padding: 1rem !important; }
+    .chat-input-area { padding: 0.75rem 1rem !important; }
+    .msg { max-width: 88% !important; }
+
+    p.fs-5 { font-size: 0.95rem !important; }
+    h4.fs-3 { font-size: 1.2rem !important; }
+
+    [class*="btn-opcion-"] {
+        padding-left: 0.6rem !important;
+        padding-right: 0.6rem !important;
+        font-size: 0.88rem !important;
+    }
+    .d-flex.gap-2.mb-3 > [class*="btn-opcion-"] { flex: 1; }
+
+    .dropzone { padding: 1.5rem 1rem; }
+    .mapa-calor { max-height: 320px; }
+
+    .modal-card { padding: 32px 20px 24px; }
+    .modal-title { font-size: 22px; }
 }

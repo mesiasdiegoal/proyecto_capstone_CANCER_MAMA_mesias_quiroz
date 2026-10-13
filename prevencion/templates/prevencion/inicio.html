@@ -13,65 +13,60 @@
 </head>
 <body class="py-5">
     <div class="container" style="max-width: 900px;">
-        
+
         <!-- Navbar Superior -->
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <div class="d-flex align-items-center gap-2">
-                <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 38px; height: 38px; background-color: rgba(139, 92, 246, 0.12); color: #7c3aed;">
+        <div class="d-flex justify-content-between align-items-center mb-4 mb-md-5 gap-2">
+            <div class="d-flex align-items-center gap-2 min-w-0">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 38px; height: 38px; background-color: rgba(139, 92, 246, 0.12); color: #7c3aed;">
                     <i class="bi bi-heart-pulse-fill fs-5"></i>
                 </div>
-                <span class="badge bg-light text-secondary border px-3 py-2 fw-medium" style="border-radius: 50px;">
-                    <i class="bi bi-person-fill me-1" style="color: #7c3aed;"></i> Paciente: <strong>{{ user.username }}</strong>
+                <span class="badge bg-light text-secondary border px-3 py-2 fw-medium text-truncate" style="border-radius: 50px; max-width: 55vw;">
+                    <i class="bi bi-person-fill me-1" style="color: #7c3aed;"></i> <strong>{{ user.username }}</strong>
                 </span>
             </div>
-            <a href="{% url 'cerrar_sesion' %}" class="btn btn-outline-danger btn-sm px-3">
-                <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+            <a href="{% url 'cerrar_sesion' %}" class="btn btn-outline-danger btn-sm px-3 flex-shrink-0" aria-label="Cerrar sesión">
+                <i class="bi bi-box-arrow-right"></i>
+                <span class="d-none d-sm-inline ms-1">Cerrar Sesión</span>
             </a>
         </div>
 
         <!-- Encabezado Principal -->
-        <div class="text-center mb-5">
+        <div class="text-center mb-4 mb-md-5">
             <span class="badge bg-light text-secondary border px-3 py-1 mb-3 fw-normal" style="border-radius: 50px; font-size: 0.85rem;">
                 Plataforma Médica Integral
             </span>
-            <h1 class="fw-bold display-5 mb-2" style="color: #7c3aed !important; letter-spacing: -0.5px;">
-                Red Mamaria Preventiva con AI
-            </h1>
-            <p class="text-muted fs-5 mx-auto" style="max-width: 680px;">
+            <h1 class="fw-bold hero-titulo mb-2">Red Mamaria Preventiva con AI</h1>
+            <p class="text-muted hero-texto mx-auto">
                 Educación interactiva, evaluación de imágenes de diagnóstico y asistencia virtual con inteligencia artificial para tu salud mamaria.
             </p>
         </div>
 
-        <hr class="my-5" style="opacity: 0.1;">
+        <hr class="my-4 my-md-5" style="opacity: 0.1;">
 
-        <!-- Módulos principales (2 tarjetas centradas) -->
-        <div class="row g-4 justify-content-center">
-            
-            <div class="col-md-5">
-                <div class="card-session p-4 h-100 d-flex flex-column justify-content-between text-center">
-                    <div>
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 52px; height: 52px; background-color: rgba(139, 92, 246, 0.12); color: #7c3aed;">
-                            <i class="bi bi-journal-bookmark-fill fs-4"></i>
-                        </div>
-                        <h5 class="fw-bold mb-2" style="color: #7c3aed;">Módulo Educativo</h5>
+        <!-- Módulos principales -->
+        <div class="row g-3 g-md-4 justify-content-center">
+
+            <div class="col-12 col-md-5">
+                <div class="card-session modulo-card p-4 h-100">
+                    <div class="modulo-icono"><i class="bi bi-journal-bookmark-fill"></i></div>
+                    <div class="modulo-texto">
+                        <h5 class="fw-bold">Módulo Educativo</h5>
                         <p class="text-muted small">Accede a las 3 sesiones interactivas sobre prevención, detección y mitos.</p>
                     </div>
-                    <a href="{% url 'educativo_menu' %}" class="btn btn-medtech w-100 mt-4">
+                    <a href="{% url 'educativo_menu' %}" class="btn btn-medtech w-100 modulo-btn">
                         Ingresar al Módulo <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                 </div>
             </div>
 
-            <div class="col-md-5">
-                <div class="card-session p-4 h-100 d-flex flex-column justify-content-between text-center">
-                    <div>
-                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 52px; height: 52px; background-color: rgba(139, 92, 246, 0.12); color: #7c3aed;">
-                            <i class="bi bi-file-earmark-medical-fill fs-4"></i>
-                        </div>
-                        <h5 class="fw-bold mb-2" style="color: #7c3aed;">Análisis de Imagen</h5>
-                        <p class="text-muted small">Sube tu ecografía para evaluación mediante Inteligencia Artificial.</p>
+            <div class="col-12 col-md-5">
+                <div class="card-session modulo-card p-4 h-100">
+                    <div class="modulo-icono"><i class="bi bi-file-earmark-medical-fill"></i></div>
+                    <div class="modulo-texto">
+                        <h5 class="fw-bold">Análisis de Imagen</h5>
+                        <p class="text-muted small">Sube tu mamografía para una evaluación educativa mediante Inteligencia Artificial.</p>
                     </div>
-                    <a href="{% url 'analisis_imagen' %}" class="btn btn-medtech w-100 mt-4">
+                    <a href="{% url 'analisis_imagen' %}" class="btn btn-medtech w-100 modulo-btn">
                         Ingresar <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                 </div>
@@ -81,7 +76,7 @@
     </div>
 
     <!-- Pestaña flotante del Asistente Virtual -->
-    <button type="button" class="chat-widget-btn" id="toggleChatBtn">
+    <button type="button" class="chat-widget-btn" id="toggleChatBtn" aria-label="Hablar con Sonia">
         <i class="bi bi-robot fs-5"></i>
         <span>Hablar con Sonia</span>
     </button>
