@@ -13,7 +13,8 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
-
+from .forms import FormularioUsuario, FormularioPerfil
+from .models import Perfil, PreguntaEducativa
 from .services.respuestas_respaldo import obtener_respuesta_respaldo
 from .services.correos import enviar_bienvenida
 from .services.analisis_cnn import (
@@ -22,7 +23,6 @@ from .services.analisis_cnn import (
     UMBRAL_AMARILLO,
     UMBRAL_ROJO,
 )
-from .models import PreguntaEducativa
 
 
 # ============================================================
@@ -30,11 +30,40 @@ from .models import PreguntaEducativa
 # ============================================================
 
 def landing(request):
-
     return render(
         request,
         'prevencion/landing.html'
     )
+
+
+# ============================================================
+# PERFIL DE USUARIO (CORREGIDO)
+# ============================================================
+
+@login_required(login_url='iniciar_sesion')
+def perfil_usuario(request):
+    perfil, _ = Perfil.objects.get_or_create(usuario=request.user)
+
+    if request.method == 'POST':
+        form_usuario = FormularioUsuario(request.POST, instance=request.user)
+        form_perfil = FormularioPerfil(request.POST, request.FILES, instance=perfil)
+
+        if form_usuario.is_valid() and form_perfil.is_valid():
+            form_usuario.save()
+            form_perfil.save()
+            messages.success(request, '¡Tu perfil ha sido actualizado con éxito!')
+            return redirect('perfil_usuario')
+    else:
+        form_usuario = FormularioUsuario(instance=request.user)
+        form_perfil = FormularioPerfil(instance=perfil)
+
+    contexto = {
+        'form_usuario': form_usuario,
+        'form_perfil': form_perfil,
+        'perfil': perfil
+    }
+    # AHORA BUSCA EN prevencion/perfil.html
+    return render(request, 'prevencion/perfil.html', contexto)
 
 
 # ============================================================
@@ -49,7 +78,6 @@ def registro_usuario(request):
         correo = (request.POST.get('email') or '').strip()
         clave = request.POST.get('password') or ''
 
-        # Datos para volver a llenar el formulario si hay un error
         contexto = {
             'datos': {
                 'username': usuario,
@@ -69,7 +97,6 @@ def registro_usuario(request):
         ]
 
         if faltantes:
-
             for nombre in faltantes:
                 messages.error(
                     request,
@@ -82,7 +109,6 @@ def registro_usuario(request):
                 contexto
             )
 
-        # El correo debe ser válido: ahí llega la bienvenida
         try:
             validate_email(correo)
         except ValidationError:
@@ -97,12 +123,10 @@ def registro_usuario(request):
             )
 
         if User.objects.filter(username=usuario).exists():
-
             messages.error(
                 request,
                 'El nombre de usuario ya existe. Intenta con otro.'
             )
-
             return render(
                 request,
                 'prevencion/registro.html',
@@ -119,10 +143,8 @@ def registro_usuario(request):
 
         login(request, nuevo_usuario)
 
-        # El Inicio mostrará el pop-up de bienvenida una vez
         request.session['bienvenida'] = 'registro'
 
-        # Correo de bienvenida. Si falla, la cuenta queda creada igual.
         enviar_bienvenida(
             nuevo_usuario,
             request.build_absolute_uri('/')
@@ -156,7 +178,6 @@ def iniciar_sesion(request):
         ]
 
         if faltantes:
-
             for nombre in faltantes:
                 messages.error(
                     request,
@@ -176,21 +197,15 @@ def iniciar_sesion(request):
         )
 
         if user is not None:
-
             login(request, user)
-
-            # El Inicio mostrará el pop-up de bienvenida una vez
             request.session['bienvenida'] = 'login'
-
             return redirect('inicio')
 
         else:
-
             messages.error(
                 request,
                 'Usuario o contraseña incorrectos.'
             )
-
             return redirect('iniciar_sesion')
 
     return render(
@@ -204,9 +219,7 @@ def iniciar_sesion(request):
 # ============================================================
 
 def cerrar_sesion(request):
-
     logout(request)
-
     return redirect('iniciar_sesion')
 
 
@@ -217,8 +230,6 @@ def cerrar_sesion(request):
 @login_required(login_url='iniciar_sesion')
 def inicio(request):
 
-    # 'registro', 'login' o None. Se saca de la sesión para que el
-    # pop-up aparezca solo la primera vez que se llega al Inicio.
     bienvenida = request.session.pop('bienvenida', None)
 
     return render(
@@ -237,8 +248,6 @@ def inicio(request):
 @login_required(login_url='iniciar_sesion')
 def educativo_menu(request):
 
-    # Ids de las preguntas de cada sesión: con ellos el navegador calcula
-    # el progreso (las respuestas se guardan en el navegador, por usuario).
     preguntas_por_sesion = {
         sesion: list(
             PreguntaEducativa.objects.filter(sesion=sesion)
@@ -273,8 +282,6 @@ def educativo_sesion(request, tipo_sesion):
         'S3': 'Sesión 3: Verdadero o Falso',
     }
 
-    # Las respuestas se corrigen y se recuerdan en el navegador
-    # (ver el script de sesion_educativa.html).
     preguntas = PreguntaEducativa.objects.filter(
         sesion=tipo_sesion
     ).prefetch_related(
@@ -290,7 +297,6 @@ def educativo_sesion(request, tipo_sesion):
         'preguntas': preguntas,
         'nombre_sesion': nombre,
         'codigo_sesion': tipo_sesion,
-        # Para calcular el progreso de esta sesión en el navegador
         'ids_preguntas': [pregunta.id for pregunta in preguntas],
     }
 
@@ -307,10 +313,6 @@ def educativo_sesion(request, tipo_sesion):
 
 @login_required(login_url='iniciar_sesion')
 def analisis_imagen(request):
-    """
-    Analiza la mamografía con la CNN y muestra el resultado.
-    La imagen se procesa en memoria y NO se guarda en ningún lado.
-    """
 
     resultado = None
     error = None
@@ -320,7 +322,6 @@ def analisis_imagen(request):
         imagen = request.FILES.get('imagen_original')
 
         if not imagen:
-
             error = 'Debes seleccionar una imagen antes de continuar.'
 
         else:
@@ -339,7 +340,6 @@ def analisis_imagen(request):
                 )
 
             finally:
-                # Se descarta el archivo subido (no se guarda)
                 imagen.close()
 
     return render(
@@ -348,7 +348,6 @@ def analisis_imagen(request):
         {
             'resultado': resultado,
             'error': error,
-            # Rangos del semáforo (vienen del config.json del modelo)
             'rango_verde': round(UMBRAL_AMARILLO * 100),
             'rango_rojo': round(UMBRAL_ROJO * 100),
         }
@@ -373,11 +372,6 @@ def asistente_virtual(request):
 # ============================================================
 
 def respuesta_error_sonia(mensaje, detalle, status):
-    """
-    Respuesta de error del chat. En tu PC (SONIA_MOSTRAR_ERRORES) agrega
-    el detalle técnico para poder ver en el chat qué falló realmente;
-    en Vercel el público solo ve el mensaje amable.
-    """
 
     if settings.SONIA_MOSTRAR_ERRORES:
         mensaje = f"{mensaje}\n\n[DEBUG] {detalle}"
@@ -385,7 +379,6 @@ def respuesta_error_sonia(mensaje, detalle, status):
     return JsonResponse(
         {
             'respuesta': mensaje,
-            # El navegador no guarda estos mensajes en el historial
             'es_error': True,
         },
         status=status
@@ -397,14 +390,6 @@ MAX_LARGO_MENSAJE_HISTORIAL = 2000
 
 
 def armar_historial(historial):
-    """
-    Convierte los mensajes anteriores del chat (enviados por el navegador)
-    al formato "contents" de Gemini, para que Sonia recuerde la conversación.
-
-    Cada elemento viene como {"rol": "usuario" | "sonia", "texto": "..."}.
-    Se ignora lo que no tenga ese formato, se conservan solo los últimos
-    mensajes y se juntan los mensajes seguidos del mismo rol.
-    """
 
     if not isinstance(historial, list):
         return []
@@ -434,11 +419,9 @@ def armar_historial(historial):
         else:
             contents.append({'role': rol, 'parts': [{'text': texto}]})
 
-    # La conversación debe empezar con un mensaje del usuario
     while contents and contents[0]['role'] != 'user':
         contents.pop(0)
 
-    # Y terminar en Sonia, porque a continuación va el mensaje nuevo
     if contents and contents[-1]['role'] == 'user':
         contents.pop()
 
@@ -446,15 +429,6 @@ def armar_historial(historial):
 
 
 def consultar_gemini(modelo, payload, headers, timeout=20):
-    """
-    Envía el mensaje a un modelo de Gemini.
-
-    Retorna (datos, error, reintentable):
-      - datos: el JSON de la respuesta si salió bien, o None.
-      - error: texto del error si falló.
-      - reintentable: True si el error es temporal (saturación, límite
-        de uso, timeout), False si no, y None si la API key es inválida.
-    """
 
     url = (
         "https://generativelanguage.googleapis.com/"
@@ -462,7 +436,6 @@ def consultar_gemini(modelo, payload, headers, timeout=20):
     )
 
     try:
-
         response = requests.post(
             url,
             json=payload,
@@ -471,15 +444,12 @@ def consultar_gemini(modelo, payload, headers, timeout=20):
         )
 
     except requests.exceptions.RequestException as error:
-
         return None, f"{modelo}: error de conexión ({error})", True
 
     try:
-
         datos = response.json()
 
     except ValueError:
-
         return (
             None,
             f"{modelo}: respuesta no JSON (HTTP {response.status_code})",
@@ -503,13 +473,6 @@ def consultar_gemini(modelo, payload, headers, timeout=20):
 @login_required(login_url='iniciar_sesion')
 @require_POST
 def asistente_virtual_mensaje(request):
-    """
-    Endpoint AJAX para la asistente virtual Sonia.
-    """
-
-    # ========================================================
-    # 1. LEER MENSAJE DEL USUARIO
-    # ========================================================
 
     try:
         data = json.loads(request.body or '{}')
@@ -534,24 +497,11 @@ def asistente_virtual_mensaje(request):
             status=400
         )
 
-
-    # ========================================================
-    # 2. OBTENER API KEY
-    # ========================================================
-
-    # Se lee desde settings.py, que a su vez la toma del archivo .env
-    # (en tu PC) o de las Environment Variables (en Vercel).
     api_key = (
         getattr(settings, 'GEMINI_API_KEY', None) or ''
     ).strip()
 
-
-    # ========================================================
-    # 3. VALIDAR API KEY
-    # ========================================================
-
     if not api_key:
-
         print(
             "SONIA ERROR: No se encontró GEMINI_API_KEY. "
             "Agrégala al archivo .env o a las variables de Vercel."
@@ -563,11 +513,6 @@ def asistente_virtual_mensaje(request):
             'Falta GEMINI_API_KEY en el archivo .env.',
             status=500
         )
-
-
-    # ========================================================
-    # 4. INSTRUCCIONES DE SONIA
-    # ========================================================
 
     prompt_sistema = """
 Eres Sonia, una asistente virtual educativa especializada
@@ -627,7 +572,7 @@ REGLAS MÉDICAS:
 5. Si existen señales potencialmente preocupantes,
    recomienda solicitar atención médica.
 
-6. Si corresponde al contexto chileno, puedes mencionar
+6. Si corresponden al contexto chileno, puedes mencionar
    CESFAM, consultorios, centros médicos u hospitales.
 
 7. No indiques medicamentos ni tratamientos personalizados
@@ -651,13 +596,7 @@ usuario hace una pregunta de seguimiento (por ejemplo "¿y en
 hombres?"), respóndela en relación a lo que se venía hablando.
 """
 
-
-    # ========================================================
-    # 5. CREAR PAYLOAD PARA GEMINI
-    # ========================================================
-
     payload = {
-
         "system_instruction": {
             "parts": [
                 {
@@ -665,13 +604,9 @@ hombres?"), respóndela en relación a lo que se venía hablando.
                 }
             ]
         },
-
-        # Mensajes anteriores del chat + el mensaje nuevo, para que Sonia
-        # pueda seguir la conversación.
         "contents": armar_historial(data.get('historial')) + [
             {
                 "role": "user",
-
                 "parts": [
                     {
                         "text": mensaje_usuario
@@ -679,42 +614,21 @@ hombres?"), respóndela en relación a lo que se venía hablando.
                 ]
             }
         ],
-
-        # Los modelos Gemini recientes "piensan" antes de responder y esos
-        # tokens cuentan dentro de este límite. Con un valor bajo la
-        # respuesta puede llegar vacía, por eso se deja holgado.
         "generationConfig": {
             "maxOutputTokens": 4096
         }
     }
-
-
-    # ========================================================
-    # 6. HEADERS
-    # ========================================================
 
     headers = {
         "Content-Type": "application/json",
         "x-goog-api-key": api_key
     }
 
-
-    # ========================================================
-    # 7. INTENTAR CONSULTAR GEMINI (modelo por modelo)
-    # ========================================================
-
-    # Cuando Google está saturado (503) el modelo que responde va
-    # cambiando de un momento a otro, así que si todos fallan por un
-    # error temporal se espera un poco y se intenta una ronda más.
     RONDAS = 2
-    ESPERA_ENTRE_RONDAS = 2  # segundos
-
-    # Segundos que se espera a cada modelo, y tope para todo el proceso:
-    # al cumplirse, se deja de intentar y se usa la respuesta de respaldo,
-    # para que la persona nunca espere demasiado.
+    ESPERA_ENTRE_RONDAS = 2
     TIEMPO_ESPERA = 30
     TIEMPO_MAXIMO_TOTAL = 60
-    inicio = time.monotonic()
+    inicio_tiempo = time.monotonic()
 
     res_data = None
     modelo_utilizado = None
@@ -735,7 +649,7 @@ hombres?"), respóndela en relación a lo que se venía hablando.
         for modelo in modelos_pendientes:
 
             tiempo_restante = (
-                TIEMPO_MAXIMO_TOTAL - (time.monotonic() - inicio)
+                TIEMPO_MAXIMO_TOTAL - (time.monotonic() - inicio_tiempo)
             )
 
             if tiempo_restante < 3:
@@ -760,8 +674,6 @@ hombres?"), respóndela en relación a lo que se venía hablando.
             errores.append(f"[ronda {ronda}] {error}")
             print(f"SONIA: {errores[-1]}")
 
-            # API key inválida o sin permisos: ningún otro modelo va a
-            # funcionar, así que no tiene sentido seguir intentando.
             if reintentable is None:
                 reintentables = []
                 break
@@ -769,20 +681,11 @@ hombres?"), respóndela en relación a lo que se venía hablando.
             if reintentable:
                 reintentables.append(modelo)
 
-        # Solo se repiten los modelos que fallaron por algo temporal
-        # (saturación, límite de uso, timeout), no los inexistentes.
         if res_data is not None or not reintentables or tiempo_agotado:
             break
 
         modelos_pendientes = reintentables
 
-
-    # ========================================================
-    # 8. NINGÚN MODELO RESPONDIÓ
-    # ========================================================
-
-    # En vez de mostrar un error, Sonia entrega información general
-    # preescrita sobre el tema, para que el chat nunca quede sin respuesta.
     if res_data is None:
 
         print("SONIA: ningún modelo respondió, se usa respuesta de respaldo")
@@ -797,22 +700,14 @@ hombres?"), respóndela en relación a lo que se venía hablando.
         return JsonResponse(
             {
                 'respuesta': respuesta,
-                # El navegador la muestra, pero no la guarda en el
-                # historial de la conversación.
                 'respaldo': True,
             }
         )
-
-
-    # ========================================================
-    # 9. EXTRAER RESPUESTA
-    # ========================================================
 
     candidates = res_data.get('candidates') or []
 
     if not candidates:
 
-        # Suele pasar cuando Gemini bloquea el mensaje por seguridad.
         bloqueo = res_data.get('promptFeedback', {}).get('blockReason')
 
         return respuesta_error_sonia(
@@ -828,8 +723,6 @@ hombres?"), respóndela en relación a lo que se venía hablando.
     textos = [
         part.get('text', '')
         for part in candidato.get('content', {}).get('parts', [])
-        # Las partes marcadas como "thought" son el razonamiento
-        # interno del modelo, no la respuesta final.
         if not part.get('thought')
     ]
 

@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Modelos para las 3 Sesiones Educativas (CRUD)
 class PreguntaEducativa(models.Model):
@@ -57,6 +61,24 @@ class OpcionRespuesta(models.Model):
         estado = "CORRECTA" if self.es_correcta else "INCORRECTA"
         return f"[{estado}] {self.texto_opcion}"
 
+class Perfil(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
+    alias = models.CharField(max_length=50, blank=True, null=True, verbose_name="Alias o Nombre Preferido")
+    foto_perfil = models.ImageField(upload_to='fotos_perfil/', blank=True, null=True, verbose_name="Foto de Perfil")
 
+    def __str__(self):
+        return f"Perfil de {self.usuario.username}"
+
+# Se crea o guarda el perfil automáticamente al registrar o modificar un User
+@receiver(post_save, sender=User)
+def crear_o_guardar_perfil(sender, instance, created, **kwargs):
+    if created:
+        Perfil.objects.create(usuario=instance)
+    else:
+        # Asegura que si el usuario no tenía perfil creado previo a esta actualización, no arroje error
+        if hasattr(instance, 'perfil'):
+            instance.perfil.save()
+        else:
+            Perfil.objects.create(usuario=instance)
 # Las mamografías analizadas NO se guardan: se procesan en memoria
 # (ver prevencion/services/analisis_cnn.py).

@@ -29,7 +29,7 @@
             min-height: 100vh !important;
             min-height: 100dvh !important;
             margin: 0 !important;
-            padding: 1rem !important; /* Margen de seguridad constante en las orillas */
+            padding: 1rem !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -62,7 +62,6 @@
             background: #ffffff !important;
             box-shadow: 0 10px 30px rgba(139, 92, 246, 0.12) !important;
             
-            /* Bloquea transformaciones de scroll */
             transform: none !important;
             opacity: 1 !important;
             transition: none !important;
@@ -136,12 +135,15 @@
                     <div class="form-text small">Te enviaremos un correo de bienvenida a esta dirección.</div>
                 </div>
 
-                <!-- Contraseña -->
+                <!-- Contraseña con Ojito Dentro de la Barra -->
                 <div class="mb-4">
                     <label for="password" class="form-label fw-medium text-dark small">Contraseña</label>
-                    <div class="input-group">
+                    <div class="input-group position-relative">
                         <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-lock"></i></span>
-                        <input type="password" name="password" id="password" class="form-control border-start-0 ps-0" placeholder="••••••••" required data-nombre="Contraseña" autocomplete="new-password">
+                        <input type="password" name="password" id="password" class="form-control border-start-0 ps-0 pe-5" placeholder="••••••••" required data-nombre="Contraseña" autocomplete="new-password">
+                        <span onclick="togglePassword('password', this)" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 10; cursor: pointer; color: #74638d; padding: 4px;">
+                            <i class="bi bi-eye-slash fs-6"></i>
+                        </span>
                     </div>
                 </div>
 
@@ -161,6 +163,23 @@
 
         </div>
     </div>
+
+    <!-- Script para alternar visibilidad de contraseña -->
+    <script>
+        function togglePassword(inputId, el) {
+            const input = document.getElementById(inputId);
+            const icon = el.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            }
+        }
+    </script>
 
     <script src="{% static 'prevencion/js/animaciones.js' %}"></script>
     <script src="{% static 'prevencion/js/validacion_formularios.js' %}"></script>
