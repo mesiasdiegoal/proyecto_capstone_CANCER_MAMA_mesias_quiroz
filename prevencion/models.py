@@ -1,5 +1,5 @@
-from django.db import models
-from django.contrib.auth.models import User
+import hashlib
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -64,7 +64,64 @@ class OpcionRespuesta(models.Model):
 class Perfil(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
     alias = models.CharField(max_length=50, blank=True, null=True, verbose_name="Alias o Nombre Preferido")
-    foto_perfil = models.ImageField(upload_to='fotos_perfil/', blank=True, null=True, verbose_name="Foto de Perfil")
+
+    # Avatar: en vez de una foto (Vercel no puede guardar archivos subidos)
+    # se muestra un círculo de color con la inicial. No se guarda nada:
+    # la letra y el color se calculan cada vez a partir del usuario.
+    # Pares (color claro, color oscuro) para un degradado, todos en la gama
+    # morada y rosada de la página para que combinen con el diseño.
+    COLORES_AVATAR = [
+        ('#a78bfa', '#7c3aed'),   # violeta
+        ('#f472b6', '#db2777'),   # rosado
+        ('#c084fc', '#9333ea'),   # morado
+        ('#818cf8', '#4f46e5'),   # índigo
+        ('#fb7185', '#e11d48'),   # frambuesa
+        ('#e879f9', '#c026d3'),   # fucsia
+        ('#a5b4fc', '#6366f1'),   # lavanda
+        ('#f9a8d4', '#ec4899'),   # rosa claro
+    ]
+
+    @property
+    def nombre_visible(self):
+        return self.alias or self.usuario.username
+
+    @property
+    def nombre_para_avatar(self):
+        # Prioridad: alias -> nombre y apellido -> nombre de usuario
+        nombre_completo = f'{self.usuario.first_name} {self.usuario.last_name}'.strip()
+        return (self.alias or '').strip() or nombre_completo or self.usuario.username
+
+    @property
+    def iniciales(self):
+        # - Dos o más palabras: iniciales de las dos primeras ("Diego Mesías" -> "DM")
+        # - Una palabra: sus dos primeras letras ("Diego" -> "Di", "yuf" -> "Yu")
+        # Solo cuentan letras y números (se ignoran emojis y símbolos).
+        palabras = [
+            ''.join(c for c in palabra if c.isalnum())
+            for palabra in self.nombre_para_avatar.split()
+        ]
+        palabras = [p for p in palabras if p]
+
+        if len(palabras) >= 2:
+            return (palabras[0][0] + palabras[1][0]).upper()
+        if palabras:
+            palabra = palabras[0]
+            return palabra[0].upper() + palabra[1:2].lower()
+        return '?'
+
+    @property
+    def colores_avatar(self):
+        # Siempre los mismos colores para el mismo usuario: se calcula un
+        # "resumen" numérico (hash) del nombre de usuario y se usa para
+        # elegir uno de los pares de la lista.
+        resumen = hashlib.md5(self.usuario.username.encode('utf-8')).hexdigest()
+        return self.COLORES_AVATAR[int(resumen, 16) % len(self.COLORES_AVATAR)]
+
+    @property
+    def fondo_avatar(self):
+        # Degradado CSS listo para usar en style="background: ..."
+        claro, oscuro = self.colores_avatar
+        return f'linear-gradient(135deg, {claro}, {oscuro})'
 
     def __str__(self):
         return f"Perfil de {self.usuario.username}"

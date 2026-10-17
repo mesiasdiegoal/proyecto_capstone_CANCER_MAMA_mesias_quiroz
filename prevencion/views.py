@@ -46,7 +46,7 @@ def perfil_usuario(request):
 
     if request.method == 'POST':
         form_usuario = FormularioUsuario(request.POST, instance=request.user)
-        form_perfil = FormularioPerfil(request.POST, request.FILES, instance=perfil)
+        form_perfil = FormularioPerfil(request.POST, instance=perfil)
 
         if form_usuario.is_valid() and form_perfil.is_valid():
             form_usuario.save()

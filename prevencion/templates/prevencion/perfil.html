@@ -24,7 +24,7 @@
         <div class="card p-4 p-md-5 border-0 shadow-sm rounded-4">
             <div class="text-center mb-4">
                 <h3 class="fw-bold" style="color: #7c3aed;">Editar Perfil</h3>
-                <p class="text-muted small mb-0">Actualiza tu foto, alias y datos personales</p>
+                <p class="text-muted small mb-0">Actualiza tu alias y tus datos personales</p>
             </div>
 
             {% if messages %}
@@ -36,28 +36,17 @@
                 {% endfor %}
             {% endif %}
 
-            <form method="POST" enctype="multipart/form-data" data-validar>
+            <form method="POST" data-validar>
                 {% csrf_token %}
 
-                <!-- Foto de Perfil con Vista Previa -->
+                <!-- Avatar: círculo con la inicial (cambia en vivo al escribir el alias) -->
                 <div class="text-center mb-4">
-                    <div class="position-relative d-inline-block">
-                        {% if perfil.foto_perfil %}
-                            <img src="{{ perfil.foto_perfil.url }}" id="previewPerfil" alt="Foto de Perfil" class="rounded-circle img-thumbnail shadow-sm" style="width: 110px; height: 110px; object-fit: cover;">
-                        {% else %}
-                            <div id="previewFallback" class="d-inline-flex align-items-center justify-content-center rounded-circle shadow-sm" style="width: 110px; height: 110px; background-color: rgba(139, 92, 246, 0.12); color: #7c3aed;">
-                                <i class="bi bi-person-fill display-4"></i>
-                            </div>
-                            <img id="previewPerfil" class="rounded-circle img-thumbnail shadow-sm d-none" style="width: 110px; height: 110px; object-fit: cover;">
-                        {% endif %}
+                    <div id="avatarPerfil" class="d-inline-block">
+                        {% include "prevencion/_avatar.html" with perfil=perfil tamano=110 %}
                     </div>
-                    <div class="mt-2">
-                        <label for="id_foto_perfil" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                            <i class="bi bi-camera-fill me-1"></i> Subir / Cambiar Foto
-                        </label>
-                        <input type="file" name="foto_perfil" id="id_foto_perfil" class="d-none" accept="image/*" onchange="mostrarFotoPerfil(this)">
-                    </div>
-                    <small class="text-muted d-block mt-1" style="font-size: 0.8rem;">La foto de perfil es opcional.</small>
+                    <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
+                        Tu avatar muestra las iniciales de tu alias, de tu nombre o de tu usuario.
+                    </small>
                 </div>
 
                 <hr class="my-4" style="opacity: 0.1;">
@@ -103,19 +92,39 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'prevencion/js/validacion_formularios.js' %}"></script>
     <script>
-        function mostrarFotoPerfil(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const img = document.getElementById('previewPerfil');
-                    const fallback = document.getElementById('previewFallback');
-                    img.src = e.target.result;
-                    img.classList.remove('d-none');
-                    if (fallback) fallback.classList.add('d-none');
+        // Actualiza las iniciales del avatar mientras se escribe.
+        // Misma regla que el servidor (Perfil.iniciales en models.py):
+        // alias -> nombre y apellido -> usuario; dos palabras = "DM",
+        // una palabra = "Di"; solo cuentan letras y números.
+        (function () {
+            const avatar = document.querySelector('#avatarPerfil .avatar-inicial');
+            const campos = ['id_alias', 'id_first_name', 'id_last_name']
+                .map(id => document.getElementById(id));
+            const usuario = "{{ user.username|escapejs }}";
+            if (!avatar || campos.some(c => !c)) return;
+            const [alias, nombre, apellido] = campos;
+
+            function iniciales(texto) {
+                const palabras = texto.split(/\s+/)
+                    .map(p => Array.from(p).filter(c => /[\p{L}\p{N}]/u.test(c)).join(''))
+                    .filter(p => p);
+                if (palabras.length >= 2) {
+                    return (Array.from(palabras[0])[0] + Array.from(palabras[1])[0]).toUpperCase();
                 }
-                reader.readAsDataURL(input.files[0]);
+                if (palabras.length === 1) {
+                    const letras = Array.from(palabras[0]);
+                    return letras[0].toUpperCase() + (letras[1] || '').toLowerCase();
+                }
+                return '?';
             }
-        }
+
+            function actualizar() {
+                const completo = (nombre.value + ' ' + apellido.value).trim();
+                avatar.textContent = iniciales(alias.value.trim() || completo || usuario);
+            }
+
+            campos.forEach(c => c.addEventListener('input', actualizar));
+        })();
     </script>
 </body>
 </html>

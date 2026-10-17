@@ -13,8 +13,7 @@ class FormularioUsuario(forms.ModelForm):
 
 class FormularioPerfil(forms.ModelForm):
     alias = forms.CharField(label="Alias o Nombre preferido", max_length=50, required=False)
-    foto_perfil = forms.ImageField(label="Foto de Perfil (Opcional)", required=False)
 
     class Meta:
         model = Perfil
-        fields = ['alias', 'foto_perfil']
+        fields = ['alias']
