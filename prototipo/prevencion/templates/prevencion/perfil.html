@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Red Mamaria Preventiva con AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/media/imagenes_mamarias/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'prevencion/css/estilos.css' %}">
+</head>
+<body class="py-5">
+    <div class="container" style="max-width: 600px;">
+
+        <!-- Botón de regreso -->
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% url 'inicio' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Volver al Inicio
+            </a>
+        </div>
+
+        <div class="card p-4 p-md-5 border-0 shadow-sm rounded-4">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold" style="color: #7c3aed;">Editar Perfil</h3>
+                <p class="text-muted small mb-0">Actualiza tu alias y tus datos personales</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible fade show small mb-4" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" data-validar>
+                {% csrf_token %}
+
+                <!-- Avatar: círculo con la inicial (cambia en vivo al escribir el alias) -->
+                <div class="text-center mb-4">
+                    <div id="avatarPerfil" class="d-inline-block">
+                        {% include "prevencion/_avatar.html" with perfil=perfil tamano=110 %}
+                    </div>
+                    <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
+                        Tu avatar muestra las iniciales de tu alias, de tu nombre o de tu usuario.
+                    </small>
+                </div>
+
+                <hr class="my-4" style="opacity: 0.1;">
+
+                <!-- Alias / Nombre Preferido -->
+                <div class="mb-3">
+                    <label for="id_alias" class="form-label fw-medium small">Alias o Nombre Preferido</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted"><i class="bi bi-tag"></i></span>
+                        <input type="text" name="alias" id="id_alias" class="form-control" value="{{ form_perfil.alias.value|default:'' }}" placeholder="Ej: MariaF">
+                    </div>
+                </div>
+
+                <!-- Nombre -->
+                <div class="mb-3">
+                    <label for="id_first_name" class="form-label fw-medium small">Nombre</label>
+                    <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ form_usuario.first_name.value|default:'' }}" placeholder="Tu nombre">
+                </div>
+
+                <!-- Apellido -->
+                <div class="mb-3">
+                    <label for="id_last_name" class="form-label fw-medium small">Apellido</label>
+                    <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ form_usuario.last_name.value|default:'' }}" placeholder="Tu apellido">
+                </div>
+
+                <!-- Correo -->
+                <div class="mb-4">
+                    <label for="id_email" class="form-label fw-medium small">Correo Electrónico</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted"><i class="bi bi-envelope"></i></span>
+                        <input type="email" name="email" id="id_email" class="form-control" value="{{ form_usuario.email.value|default:'' }}" required data-nombre="Correo Electrónico">
+                    </div>
+                </div>
+
+                <!-- Botón Guardar -->
+                <button type="submit" class="btn btn-medtech w-100 py-2">
+                    <i class="bi bi-floppy-fill me-2"></i> Guardar Cambios
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'prevencion/js/validacion_formularios.js' %}"></script>
+    <script>
+        // Actualiza las iniciales del avatar mientras se escribe.
+        // Misma regla que el servidor (Perfil.iniciales en models.py):
+        // alias -> nombre y apellido -> usuario; dos palabras = "DM",
+        // una palabra = "Di"; solo cuentan letras y números.
+        (function () {
+            const avatar = document.querySelector('#avatarPerfil .avatar-inicial');
+            const campos = ['id_alias', 'id_first_name', 'id_last_name']
+                .map(id => document.getElementById(id));
+            const usuario = "{{ user.username|escapejs }}";
+            if (!avatar || campos.some(c => !c)) return;
+            const [alias, nombre, apellido] = campos;
+
+            function iniciales(texto) {
+                const palabras = texto.split(/\s+/)
+                    .map(p => Array.from(p).filter(c => /[\p{L}\p{N}]/u.test(c)).join(''))
+                    .filter(p => p);
+                if (palabras.length >= 2) {
+                    return (Array.from(palabras[0])[0] + Array.from(palabras[1])[0]).toUpperCase();
+                }
+                if (palabras.length === 1) {
+                    const letras = Array.from(palabras[0]);
+                    return letras[0].toUpperCase() + (letras[1] || '').toLowerCase();
+                }
+                return '?';
+            }
+
+            function actualizar() {
+                const completo = (nombre.value + ' ' + apellido.value).trim();
+                avatar.textContent = iniciales(alias.value.trim() || completo || usuario);
+            }
+
+            campos.forEach(c => c.addEventListener('input', actualizar));
+        })();
+    </script>
+</body>
+</html>

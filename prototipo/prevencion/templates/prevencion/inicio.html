@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Inicio - Red Mamaria Preventiva con AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/media/imagenes_mamarias/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'prevencion/css/estilos.css' %}">
+</head>
+<body class="py-5">
+    <div class="container" style="max-width: 900px;">
+
+        <!-- Navbar Superior con enlace al Perfil y Foto/Alias -->
+        <div class="d-flex justify-content-between align-items-center mb-4 mb-md-5 gap-2">
+            <div class="d-flex align-items-center gap-2 min-w-0">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 38px; height: 38px; background-color: rgba(139, 92, 246, 0.12); color: #7c3aed;">
+                    <i class="bi bi-heart-pulse-fill fs-5"></i>
+                </div>
+                
+                <a href="{% url 'perfil_usuario' %}" class="text-decoration-none">
+                    <span class="badge bg-light text-secondary border px-3 py-2 fw-medium text-truncate d-inline-flex align-items-center gap-2" style="border-radius: 50px; max-width: 55vw;">
+                        {% include "prevencion/_avatar.html" with perfil=user.perfil tamano=26 %}
+                        <strong>{{ user.perfil.alias|default:user.username }}</strong>
+                        <i class="bi bi-pencil-square ms-1 text-muted" style="font-size: 0.75rem;"></i>
+                    </span>
+                </a>
+            </div>
+            
+            <a href="{% url 'cerrar_sesion' %}" class="btn btn-outline-danger btn-sm px-3 flex-shrink-0" aria-label="Cerrar sesión">
+                <i class="bi bi-box-arrow-right"></i>
+                <span class="d-none d-sm-inline ms-1">Cerrar Sesión</span>
+            </a>
+        </div>
+
+        <!-- Encabezado Principal -->
+        <div class="text-center mb-4 mb-md-5">
+            <span class="badge bg-light text-secondary border px-3 py-1 mb-3 fw-normal" style="border-radius: 50px; font-size: 0.85rem;">
+                Plataforma Médica Integral
+            </span>
+            <h1 class="fw-bold hero-titulo mb-2">Red Mamaria Preventiva con AI</h1>
+            <p class="text-muted hero-texto mx-auto">
+                Educación interactiva, evaluación de imágenes de diagnóstico y asistencia virtual con inteligencia artificial para tu salud mamaria.
+            </p>
+        </div>
+
+        <hr class="my-4 my-md-5" style="opacity: 0.1;">
+
+        <!-- Módulos principales -->
+        <div class="row g-3 g-md-4 justify-content-center">
+
+            <div class="col-12 col-md-5">
+                <div class="card-session modulo-card p-4 h-100">
+                    <div class="modulo-icono"><i class="bi bi-journal-bookmark-fill"></i></div>
+                    <div class="modulo-texto">
+                        <h5 class="fw-bold">Módulo Educativo</h5>
+                        <p class="text-muted small">Accede a las 3 sesiones interactivas sobre prevención, detección y mitos.</p>
+                    </div>
+                    <a href="{% url 'educativo_menu' %}" class="btn btn-medtech w-100 modulo-btn">
+                        Ingresar al Módulo <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-5">
+                <div class="card-session modulo-card p-4 h-100">
+                    <div class="modulo-icono"><i class="bi bi-file-earmark-medical-fill"></i></div>
+                    <div class="modulo-texto">
+                        <h5 class="fw-bold">Análisis de Imagen</h5>
+                        <p class="text-muted small">Sube tu mamografía para una evaluación educativa mediante Inteligencia Artificial.</p>
+                    </div>
+                    <a href="{% url 'analisis_imagen' %}" class="btn btn-medtech w-100 modulo-btn">
+                        Ingresar <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Mapa de centros de salud -->
+        {% include "prevencion/_mapa_centros.html" %}
+    </div>
+
+    <!-- Pestaña flotante del Asistente Virtual -->
+    <button type="button" class="chat-widget-btn" id="toggleChatBtn" aria-label="Hablar con Sonia">
+        <i class="bi bi-robot fs-5"></i>
+        <span>Hablar con Sonia</span>
+    </button>
+
+    <!-- Ventana flotante colapsable del Asistente Virtual -->
+    <div class="chat-widget-box" id="chatWidgetBox">
+        <div class="chat-widget-header">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-robot fs-5"></i>
+                <strong class="mb-0">Asistente Sonia</strong>
+            </div>
+            <button type="button" class="btn-close btn-close-white" id="closeChatBtn" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="chat-widget-body" id="chatMessages">
+            <div class="msg msg-sonia">
+                Hola, soy Sonia. Puedo ayudarte con dudas sobre prevención, autoexamen y salud mamaria. ¿En qué puedo ayudarte hoy?
+            </div>
+        </div>
+
+        <div class="chat-widget-footer">
+            <div id="typingIndicator" class="small text-muted mb-1" style="display:none; font-style: italic;">
+                Sonia está escribiendo...
+            </div>
+            <form id="chatForm" class="d-flex gap-2">
+                <input type="text" id="chatInput" class="form-control form-control-sm" placeholder="Escribe tu mensaje..." autocomplete="off">
+                <button type="submit" class="btn btn-primary btn-sm px-3">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {% if bienvenida %}
+    <!-- Pop-up de bienvenida (solo después de iniciar sesión o registrarse) -->
+    <div id="modalBienvenida" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="tituloBienvenida">
+        <div class="modal-card modal-bienvenida">
+            <button type="button" class="modal-x-btn" data-cerrar-bienvenida aria-label="Cerrar">&times;</button>
+
+            <div class="illustration-container">
+                <div class="bg-circle-lg"></div>
+                <div class="bienvenida-icono">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                </div>
+            </div>
+
+            <h2 class="modal-title" id="tituloBienvenida">
+                {% if bienvenida == 'registro' %}
+                    ¡Te damos la bienvenida, {{ user.perfil.alias|default:user.username }}!
+                {% else %}
+                    ¡Hola de nuevo, {{ user.perfil.alias|default:user.username }}!
+                {% endif %}
+            </h2>
+
+            <p class="modal-description">
+                <strong>Red Mamaria Preventiva con AI</strong> es una plataforma educativa
+                para aprender sobre la prevención y la detección temprana del cáncer de mama.
+                Esto es lo que puedes hacer aquí:
+            </p>
+
+            <ul class="bienvenida-lista">
+                <li>
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                    <div>
+                        <strong>Módulo Educativo</strong>
+                        <span>3 sesiones de preguntas para aprender, derribar mitos y reforzar lo aprendido.</span>
+                    </div>
+                </li>
+                <li>
+                    <i class="bi bi-file-earmark-medical-fill"></i>
+                    <div>
+                        <strong>Análisis de Imagen</strong>
+                        <span>Si quieres, sube tu mamografía y recibe una evaluación preliminar con inteligencia artificial, con fines educativos.</span>
+                    </div>
+                </li>
+                <li>
+                    <i class="bi bi-robot"></i>
+                    <div>
+                        <strong>Asistente Sonia</strong>
+                        <span>Resuelve tus dudas sobre salud mamaria en cualquier momento.</span>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="bienvenida-aviso">
+                <i class="bi bi-info-circle-fill"></i>
+                Esta plataforma es educativa y no reemplaza la evaluación de un profesional de salud.
+            </div>
+
+            <button type="button" class="btn-entendido" data-cerrar-bienvenida>
+                Comenzar
+            </button>
+
+            <div class="modal-footer-custom">
+                <i class="bi bi-shield-lock"></i>
+                <span>Tu información es tratada con confidencialidad.</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const modal = document.getElementById("modalBienvenida");
+
+            function cerrarBienvenida() {
+                modal.style.opacity = "0";
+                setTimeout(function () { modal.remove(); }, 200);
+                document.removeEventListener("keydown", cerrarConEscape);
+            }
+
+            function cerrarConEscape(e) {
+                if (e.key === "Escape") cerrarBienvenida();
+            }
+
+            modal.querySelectorAll("[data-cerrar-bienvenida]").forEach(function (boton) {
+                boton.addEventListener("click", cerrarBienvenida);
+            });
+
+            // Cerrar al hacer clic fuera del recuadro blanco
+            modal.addEventListener("click", function (e) {
+                if (e.target === modal) cerrarBienvenida();
+            });
+
+            document.addEventListener("keydown", cerrarConEscape);
+        })();
+    </script>
+    {% endif %}
+
+    <script>
+        const CHAT_ENDPOINT = "{% url 'asistente_virtual_mensaje' %}";
+        const CSRF_TOKEN = "{{ csrf_token }}";
+    </script>
+    <script src="{% static 'prevencion/js/chat_sonia.js' %}"></script>
+</body>
+</html>

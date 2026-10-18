@@ -1,0 +1,270 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Mamaria Preventiva con AI</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/media/imagenes_mamarias/favicon.png">
+    <!-- Google Fonts Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Estilos Personalizados -->
+    <link rel="stylesheet" href="{% static 'prevencion/css/estilos.css' %}?v=20">
+
+    <link rel="stylesheet" href="{% static 'prevencion/css/landing.css' %}?v=1">
+</head>
+<body>
+
+    <!-- ===================== BARRA SUPERIOR ===================== -->
+    <nav class="landing-nav navbar navbar-expand-md">
+        <div class="container">
+            <a class="landing-brand" href="{% url 'landing' %}">
+                <i class="bi bi-heart-pulse-fill fs-4"></i>
+                <span>Red Mamaria Preventiva</span>
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#menuLanding" aria-controls="menuLanding" aria-expanded="false" aria-label="Abrir menú">
+                <i class="bi bi-list fs-2 texto-marca"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="menuLanding">
+                <ul class="navbar-nav mx-auto gap-md-2">
+                    <li class="nav-item"><a class="nav-link" href="#nosotros">Sobre nosotros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#que-es">¿Qué es?</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#datos">Datos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#senales">Señales</a></li>
+                </ul>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'inicio' %}" class="btn btn-medtech px-4">
+                        Ir a mi panel <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                {% else %}
+                    <a href="{% url 'iniciar_sesion' %}" class="btn btn-medtech px-4">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===================== HERO ===================== -->
+    <header class="hero">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 aparece">
+                    <span class="pill mb-3"><i class="bi bi-stars"></i> Prevención apoyada por inteligencia artificial</span>
+                    <h1 class="mb-3">
+                        Detectarlo a tiempo <span class="resaltado">puede salvar tu vida</span>
+                    </h1>
+                    <p class="lead mb-4">
+                        El cáncer de mama es el cáncer más frecuente en mujeres en el mundo.
+                        La buena noticia: cuando se detecta temprano, la gran mayoría de los casos
+                        se puede tratar con éxito. Aquí te ayudamos a conocerlo, prevenirlo y actuar.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'registro' %}" class="btn btn-medtech px-4 py-2">
+                            Crear cuenta gratis <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                        <a href="#que-es" class="btn btn-outline-secondary btn-pildora px-4 py-2">
+                            Conocer más
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 aparece">
+                    <div class="hero-visual">
+                        <div class="hero-visual-contenido d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <div class="cifra">+90%</div>
+                                <p class="mb-0 mt-2 fs-5">de supervivencia a 5 años cuando se detecta en etapas tempranas</p>
+                            </div>
+                            <i class="bi bi-balloon-heart-fill lazo d-none d-sm-block"></i>
+                        </div>
+                        <hr class="hero-visual-separador">
+                        <div class="hero-visual-contenido row text-center">
+                            <div class="col-4">
+                                <i class="bi bi-book-half fs-3"></i>
+                                <div class="small mt-1">Aprende</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="bi bi-cpu fs-3"></i>
+                                <div class="small mt-1">Analiza</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="bi bi-chat-heart fs-3"></i>
+                                <div class="small mt-1">Pregunta</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================== SOBRE NOSOTROS ===================== -->
+    <section id="nosotros" class="seccion">
+        <div class="container">
+            <div class="text-center mb-5 aparece">
+                <span class="pill mb-3"><i class="bi bi-people-fill"></i> Sobre nosotros</span>
+                <h2 class="seccion-titulo">Una red para cuidarnos entre todas</h2>
+                <p class="seccion-sub mt-3">
+                    Red Mamaria Preventiva nace con un objetivo simple: que ninguna persona llegue tarde a un diagnóstico
+                    por falta de información. Unimos educación en salud, inteligencia artificial y acompañamiento
+                    para que la prevención sea cercana, clara y accesible.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4 aparece">
+                    <div class="tarjeta">
+                        <div class="icono-circulo"><i class="bi bi-mortarboard-fill"></i></div>
+                        <h5 class="fw-semibold">Educación interactiva</h5>
+                        <p class="text-muted mb-0">Sesiones y preguntas para aprender sobre factores de riesgo, autoexamen y controles de forma entretenida.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 aparece">
+                    <div class="tarjeta">
+                        <div class="icono-circulo"><i class="bi bi-cpu-fill"></i></div>
+                        <h5 class="fw-semibold">Análisis con IA</h5>
+                        <p class="text-muted mb-0">Un modelo de redes neuronales entrenado con mamografías que entrega una orientación preliminar sobre tus imágenes.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 aparece">
+                    <div class="tarjeta">
+                        <div class="icono-circulo"><i class="bi bi-chat-heart-fill"></i></div>
+                        <h5 class="fw-semibold">Asistente virtual</h5>
+                        <p class="text-muted mb-0">Resuelve tus dudas en cualquier momento con nuestro asistente, con lenguaje simple y sin juicios.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== ¿QUÉ ES EL CÁNCER DE MAMA? ===================== -->
+    <section id="que-es" class="seccion">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 aparece">
+                    <span class="pill mb-3"><i class="bi bi-info-circle-fill"></i> ¿Qué es?</span>
+                    <h2 class="seccion-titulo mb-3">¿Qué es el cáncer de mama?</h2>
+                    <p class="text-muted">
+                        Es una enfermedad en la que células de la mama comienzan a crecer de forma descontrolada
+                        y forman un tumor. Generalmente se origina en los conductos que llevan la leche (carcinoma ductal)
+                        o en los lobulillos que la producen (carcinoma lobulillar).
+                    </p>
+                    <p class="text-muted">
+                        Si no se detecta a tiempo, puede extenderse a los ganglios linfáticos y a otros órganos.
+                        Por eso la <strong class="texto-marca">detección precoz</strong> es la herramienta más poderosa que tenemos.
+                    </p>
+                    <p class="text-muted mb-0">
+                        Aunque es mucho más común en mujeres, <strong>los hombres también pueden padecerlo</strong>.
+                    </p>
+                </div>
+                <div class="col-lg-6 aparece">
+                    <div class="tarjeta">
+                        <h5 class="fw-semibold mb-3"><i class="bi bi-shield-check me-2 texto-marca"></i>Lo que sí puedes hacer</h5>
+                        <div class="senal"><i class="bi bi-hand-index-thumb"></i><div><strong>Autoexamen mensual.</strong> <span class="text-muted">Conoce cómo se sienten tus mamas para notar cualquier cambio.</span></div></div>
+                        <div class="senal"><i class="bi bi-hospital"></i><div><strong>Mamografía según tu edad.</strong> <span class="text-muted">Consulta con tu médico cuándo comenzar tus controles.</span></div></div>
+                        <div class="senal"><i class="bi bi-activity"></i><div><strong>Vida activa.</strong> <span class="text-muted">Ejercicio regular y peso saludable reducen el riesgo.</span></div></div>
+                        <div class="senal"><i class="bi bi-cup-straw"></i><div><strong>Menos alcohol y tabaco.</strong> <span class="text-muted">Ambos están asociados a un mayor riesgo.</span></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== DATOS ===================== -->
+    <section id="datos" class="seccion">
+        <div class="container">
+            <div class="text-center mb-5 aparece">
+                <span class="pill mb-3"><i class="bi bi-bar-chart-fill"></i> Datos que importan</span>
+                <h2 class="seccion-titulo">Las cifras hablan por sí solas</h2>
+                <p class="seccion-sub mt-3">Conocer la magnitud del problema es el primer paso para tomarlo en serio.</p>
+            </div>
+
+            <div class="row g-4 text-center">
+                <div class="col-sm-6 col-lg-3 aparece">
+                    <div class="tarjeta">
+                        <div class="dato-num" data-contar="2.3" data-decimales="1" data-sufijo=" M">2.3 M</div>
+                        <p class="dato-txt mt-2 mb-0">nuevos diagnósticos de cáncer de mama en el mundo durante 2022</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3 aparece">
+                    <div class="tarjeta">
+                        <div class="dato-num" data-contar="670" data-sufijo=" mil">670 mil</div>
+                        <p class="dato-txt mt-2 mb-0">muertes en el mundo por esta enfermedad en el mismo año</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3 aparece">
+                    <div class="tarjeta">
+                        <div class="dato-num">1 de 20</div>
+                        <p class="dato-txt mt-2 mb-0">mujeres será diagnosticada con cáncer de mama a lo largo de su vida</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-lg-3 aparece">
+                    <div class="tarjeta">
+                        <div class="dato-num" data-contar="90" data-prefijo="+" data-sufijo="%">+90%</div>
+                        <p class="dato-txt mt-2 mb-0">de supervivencia a 5 años si se detecta y trata a tiempo</p>
+                    </div>
+                </div>
+            </div>
+            <p class="fuente text-center mt-4 mb-0">Fuente: Organización Mundial de la Salud (OMS) e IARC, estimaciones globales 2022.</p>
+        </div>
+    </section>
+
+    <!-- ===================== SEÑALES DE ALERTA ===================== -->
+    <section id="senales" class="seccion">
+        <div class="container">
+            <div class="text-center mb-5 aparece">
+                <span class="pill mb-3"><i class="bi bi-exclamation-diamond-fill"></i> Señales de alerta</span>
+                <h2 class="seccion-titulo">¿Cuándo consultar a un profesional?</h2>
+                <p class="seccion-sub mt-3">Si notas alguno de estos cambios, no esperes: pide una evaluación médica.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4 aparece"><div class="tarjeta"><div class="icono-circulo"><i class="bi bi-circle-fill"></i></div><h6 class="fw-semibold">Bulto o engrosamiento</h6><p class="text-muted small mb-0">En la mama o en la axila, generalmente indoloro.</p></div></div>
+                <div class="col-md-6 col-lg-4 aparece"><div class="tarjeta"><div class="icono-circulo"><i class="bi bi-arrows-angle-expand"></i></div><h6 class="fw-semibold">Cambios de forma o tamaño</h6><p class="text-muted small mb-0">Asimetrías nuevas que antes no estaban.</p></div></div>
+                <div class="col-md-6 col-lg-4 aparece"><div class="tarjeta"><div class="icono-circulo"><i class="bi bi-brightness-alt-high"></i></div><h6 class="fw-semibold">Piel de naranja</h6><p class="text-muted small mb-0">Hundimientos, enrojecimiento o textura rugosa en la piel.</p></div></div>
+                <div class="col-md-6 col-lg-4 aparece"><div class="tarjeta"><div class="icono-circulo"><i class="bi bi-arrow-down-circle"></i></div><h6 class="fw-semibold">Pezón retraído</h6><p class="text-muted small mb-0">Un pezón que se hunde o cambia de dirección.</p></div></div>
+                <div class="col-md-6 col-lg-4 aparece"><div class="tarjeta"><div class="icono-circulo"><i class="bi bi-droplet-half"></i></div><h6 class="fw-semibold">Secreción anormal</h6><p class="text-muted small mb-0">Líquido por el pezón, especialmente si tiene sangre.</p></div></div>
+                <div class="col-md-6 col-lg-4 aparece"><div class="tarjeta"><div class="icono-circulo"><i class="bi bi-bandaid"></i></div><h6 class="fw-semibold">Dolor persistente</h6><p class="text-muted small mb-0">Dolor localizado que no se relaciona con el ciclo menstrual.</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== LLAMADO A LA ACCIÓN ===================== -->
+    <section class="seccion pt-0">
+        <div class="container">
+            <div class="cta text-center aparece">
+                <h2 class="fw-bold mb-3">Tu salud no puede esperar</h2>
+                <p class="cta-sub mb-4 fs-5">Únete a la red, aprende a cuidarte y usa nuestras herramientas de IA para estar un paso adelante.</p>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="{% url 'registro' %}" class="btn btn-light">Crear mi cuenta</a>
+                    <a href="{% url 'iniciar_sesion' %}" class="btn btn-outline-light">Ya tengo cuenta</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== MAPA DE CENTROS DE SALUD ===================== -->
+    <section class="seccion pt-0">
+        <div class="container">
+            {% include "prevencion/_mapa_centros.html" %}
+        </div>
+    </section>
+
+    <footer class="py-4">
+        <div class="container text-center">
+            <p class="mb-1"><i class="bi bi-heart-pulse-fill me-1 texto-marca"></i> Red Mamaria Preventiva con AI</p>
+            <p class="small mb-0">Esta plataforma es de apoyo educativo y no reemplaza la evaluación de un profesional de la salud.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'prevencion/js/landing.js' %}?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% comment %}
+    Avatar: círculo con degradado y las iniciales del usuario (sin fotos).
+    Uso: {% include "prevencion/_avatar.html" with perfil=user.perfil tamano=40 %}
+    - Las letras salen del alias, del nombre y apellido o del nombre de usuario
+      ("Diego Mesías" -> DM, "Diego" -> Di). Ver Perfil.iniciales.
+    - Los colores se calculan a partir del nombre de usuario: siempre son los mismos.
+    Los estilos van aquí mismo (no en estilos.css) para que se vean bien aunque
+    el navegador tenga guardada una versión vieja del CSS.
+{% endcomment %}
+<span class="avatar-inicial"
+      style="display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+             width: {{ tamano }}px; height: {{ tamano }}px; border-radius: 50%;
+             background: {{ perfil.fondo_avatar }}; color: #ffffff;
+             font-family: 'Outfit', sans-serif; font-weight: 600; font-size: calc({{ tamano }}px * 0.38); line-height: 1; letter-spacing: 0.02em;
+             box-shadow: 0 0 0 calc({{ tamano }}px * 0.05) #ffffff, 0 4px 12px rgba(124, 58, 237, 0.25);
+             user-select: none;"
+      aria-hidden="true">{{ perfil.iniciales }}</span>
